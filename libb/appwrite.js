@@ -9,6 +9,15 @@ export const  config = {
     videoCollectionId: '66dd761600375aa5627f',
     storageId : '66dd7930001d7e662d63'
 }
+const {
+    endpoint ,
+    platform ,
+    projectId,
+    databaseID,
+    userCollectionId,
+    videoCollectionId,
+    storageId
+} = config;
 
 // Init your React Native SDK
 const client = new Client();
@@ -88,3 +97,16 @@ client
                 
             }
         }    
+
+    export const getAllPosts = async () => {
+        try {
+            const posts = await databases.listDocuments (
+                databaseID,
+                videoCollectionId
+            )
+            return posts.documents;
+        } catch (error) {
+            throw new Error (error);
+            
+        }
+    }
