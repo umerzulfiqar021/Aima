@@ -115,7 +115,7 @@ client
             const posts = await databases.listDocuments (
                 databaseID,
                 videoCollectionId,
-                [Query.orderDesc('$createAt',Query.limit(7))]
+                [Query.orderDesc('$createdAt',Query.limit(7))]
             )
             return posts.documents;
         } catch (error) {
