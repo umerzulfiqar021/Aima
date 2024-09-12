@@ -1,5 +1,6 @@
 import { useEffect,useState } from "react";
 import { Alert } from "react-native";
+import { getAllPosts } from "./appwrite";
 const useAppwrite = (fn) => {
     const [data, setData] = useState ([]);
   const [isLoading,setIsLoading] = useState(true);

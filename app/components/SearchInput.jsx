@@ -4,9 +4,9 @@ import { View, Text, TextInput, TouchableOpacity, Image, Alert } from "react-nat
 import { icons } from "../../constants";
 import { router, usePathname } from "expo-router";
 
-const SearchInput = () => {
+const SearchInput = ({initialQuery}) => {
     const pathname = usePathname()
-    const [query,setQuery] = useState ('') 
+    const [query,setQuery] = useState (initialQuery || '') 
 
   return (
       <View className="w-full h-16 px-4 bg-black-100 rounded-2xl border-2 border-black-200 focus:border-secondary flex flex-row items-center space-x-4">
