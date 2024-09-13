@@ -102,6 +102,7 @@ export const getAccount = async () => {
 export const getCurrentUser = async () => {
   try {
     const currentAccount = await getAccount();  // Check account before proceeding
+    console.log("Current Account ID:", currentAccount.$id); // Log account ID
     if (!currentAccount) {
       console.log('No account found. User may be a guest.');
       return null;
@@ -189,8 +190,8 @@ export const searchPosts = async (query) => {
 export async function getUserPosts(userId) {
     try {
       const posts = await databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.videoCollectionId,
+        config.databaseID,
+        config.videoCollectionId,
         [Query.equal("creator", userId)]
       );
   
