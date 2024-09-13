@@ -82,6 +82,7 @@ export const getSession = async () => {
   return null;
 };
 
+
 export const getAccount = async () => {
   try {
     const session = await getSession();  // Check if there is an active session

@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { Text, View, ScrollView, Image } from 'react-native';
+import { Text, View, ScrollView, Image, ActivityIndicator } from 'react-native';
 import { Redirect, router} from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../constants'
@@ -7,9 +7,21 @@ import CustomButton from './components/CustomButton';
 import { useGlobalContext } from '../context/GlobalProvider';
 
 export default function App() {
-  const {isLoading,isLoggedIn} = useGlobalContext();
-  if (!isLoading,isLoggedIn) return <Redirect href= "/home" />
-  
+  const {loading,isLogged} = useGlobalContext();
+  if (loading) {
+    return (
+      <SafeAreaView className="bg-primary h-full flex justify-center items-center">
+        <ActivityIndicator size="large" color="#ffffff" />
+        <Text className="text-white mt-4">Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // If the user is logged in, redirect to home
+  if (isLogged) {
+    return <Redirect href="/home" />;
+  }
+
   return (
     <SafeAreaView className="bg-primary h-full">
       <ScrollView contentContainerStyle={{ height: '100%' }}>
