@@ -1,138 +1,201 @@
-import { Client,Account,ID, Avatars, Databases, Query } from 'react-native-appwrite';
+import { Client, Account, ID, Avatars, Databases, Query } from 'react-native-appwrite';
 
-export const  config = {
-    endpoint : 'https://cloud.appwrite.io/v1',
-    platform : 'com.jams.SAU',
-    projectId: '66dd728900181357c40b',
-    databaseID : '66dd757a003723089701',
-    userCollectionId: '66ddc3fb00030aacd3e8',
-    videoCollectionId: '66dd761600375aa5627f',
-    storageId : '66dd7930001d7e662d63'
-}
-const {
-    endpoint ,
-    platform ,
-    projectId,
-    databaseID,
-    userCollectionId,
-    videoCollectionId,
-    storageId
-} = config;
+export const config = {
+  endpoint: 'https://cloud.appwrite.io/v1',
+  platform: 'com.jams.SAU',
+  projectId: '66dd728900181357c40b',
+  databaseID: '66dd757a003723089701',
+  userCollectionId: '66ddc3fb00030aacd3e8',
+  videoCollectionId: '66dd761600375aa5627f',
+  storageId: '66dd7930001d7e662d63',
+};
 
-// Init your React Native SDK
 const client = new Client();
 
 client
-    .setEndpoint(config.endpoint) 
-    .setProject(config.projectId)  
-    .setPlatform(config.platform) 
-    const account = new Account(client);
-    const avatars = new Avatars (client);
-    const databases = new Databases (client);
-   export const createUser = async (email,password,username) => {
-       try {
-       const newAccount = await account.create (
-        ID.unique(),
+  .setEndpoint(config.endpoint)
+  .setProject(config.projectId)
+  .setPlatform(config.platform);
+
+const account = new Account(client);
+const avatars = new Avatars(client);
+const databases = new Databases(client);
+
+export const createUser = async (email, password, username) => {
+  try {
+    const newAccount = await account.create(
+      ID.unique(),
+      email,
+      password,
+      username
+    );
+    if (!newAccount) throw new Error('Failed to create a new account.');
+
+    const avatarUrl = avatars.getInitials(username);
+    await signIn(email, password);
+
+    const newUser = await databases.createDocument(
+      config.databaseID,
+      config.userCollectionId,
+      ID.unique(),
+      {
+        accountId: newAccount.$id,
         email,
-        password,
-        username
-       ) 
-       if (!newAccount) throw Error;
-       const avatarUrl = avatars.getInitials(username);
+        username,
+        avatar: avatarUrl,
+      }
+    );
+    return newUser;
+  } catch (error) {
+    console.error('Error during user creation:', error);
+    throw new Error(error);
+  }
+};
 
-       await signIn(email, password);
-       const newUser = await databases.createDocument(
-        config.databaseID,
-        config.userCollectionId,
-        ID.unique(),
-        {
-            accountId: newAccount.$id,
-            email,
-            username,
-            avatar : avatarUrl
-        }
-       )
-       return newUser;
-       } catch (error) {
-        console.log(error);
-        throw new Error (error);
-        
-       }
+export const signIn = async (email, password) => {
+  try {
+    const activeSession = await getSession(); // Check if a session already exists
+    if (activeSession) {
+      console.log('A session is already active. Using the existing session.');
+      return activeSession; // Use existing session
     }
-    export const signIn = async (email, password) => {
-        try {
-            // Check for an existing session before creating a new one
-            const activeSession = await account.getSession('current');  // Get the current active session
-            if (activeSession) {
-                console.log('A session is already active. Using the existing session.');
-                return activeSession;  // Return the existing session instead of creating a new one
-            }
-    
-            // If no active session, create a new one
-            const session = await account.createEmailSession(email, password);
-            return session;
-    
-        } catch (error) { 
-            if (error.message.includes('Session not found')) {
-                // Create a new session if there are no active sessions
-                const session = await account.createEmailSession(email, password);
-                return session;
-            }
-            throw new Error(error.message || 'Error during sign-in');
-        }
-    }
-        export const getCurrentUser = async () => {
-            try {
-                const currentAccount = await account.get();
-                if (!currentAccount) throw Error;
-                const currentUser = await databases.listDocuments(
-                    config.databaseID,
-                    config.userCollectionId,
-                    [Query.equal('accountId', currentAccount.$id)]
-                )
-                if(!currentUser) throw Error;
-                return currentUser.documents[0];
-            } catch (error) {
-                console.log(error);
-                
-            }
-        }    
 
-    export const getAllPosts = async () => {
-        try {
-            const posts = await databases.listDocuments (
-                databaseID,
-                videoCollectionId
-            )
-            return posts.documents;
-        } catch (error) {
-            throw new Error (error);
-            
-        }
+    // If no session exists, create a new one
+    const session = await account.createEmailPasswordSession(email, password);
+    return session;
+  } catch (error) {
+    console.error('Error during sign-in:', error);
+    throw new Error(error.message || 'Error during sign-in');
+  }
+};
+
+export const getSession = async () => {
+  try {
+    const activeSession = await account.getSession('current');
+    if (activeSession) {
+      console.log('Session found:', activeSession);
+      return activeSession;
     }
-    export const getLatestPosts = async () => {
-        try {
-            const posts = await databases.listDocuments (
-                databaseID,
-                videoCollectionId,
-                [Query.orderDesc('$createdAt',Query.limit(7))]
-            )
-            return posts.documents;
-        } catch (error) {
-            throw new Error (error);
-            
-        }
+  } catch (error) {
+    console.log('No active session:', error.message);
+  }
+  return null;
+};
+
+export const getAccount = async () => {
+  try {
+    const session = await getSession();  // Check if there is an active session
+    if (!session) {
+      console.log('User is not logged in. No session found.');
+      return null;
     }
-    export const searchPosts = async (query) => {
-        try {
-            const posts = await databases.listDocuments (
-                databaseID,
-                videoCollectionId,
-                [Query.search('title', query)]
-            )
-            return posts.documents;
-        } catch (error) {
-            throw new Error (error);
-            
-        }
+
+    const accountData = await account.get();  // Get account info if session exists
+    console.log('Account data:', accountData);
+    return accountData;
+  } catch (error) {
+    console.error('Error fetching account:', error);
+    return null;
+  }
+};
+
+export const getCurrentUser = async () => {
+  try {
+    const currentAccount = await getAccount();  // Check account before proceeding
+    if (!currentAccount) {
+      console.log('No account found. User may be a guest.');
+      return null;
     }
+
+    const currentUser = await databases.listDocuments(
+      config.databaseID,
+      config.userCollectionId,
+      [Query.equal('accountId', currentAccount.$id)]
+    );
+
+    if (!currentUser) throw new Error('No user data found');
+    console.log('Current user:', currentUser.documents[0]);
+    return currentUser.documents[0];
+  } catch (error) {
+    console.error('Error during getCurrentUser:', error);
+    return null;
+  }
+};
+
+export const signOut = async () => {
+  try {
+    const session = await account.getSession('current');
+    if (session) {
+      await account.deleteSession('current');  // Delete the current session
+      console.log('User signed out successfully');
+    } else {
+      console.log('No active session found');
+    }
+  } catch (error) {
+    console.error('Error during sign-out:', error.message); // Log the error
+    if (error.message.includes('User (role: guests) missing scope (account)')) {
+      // This error indicates the user is already treated as a guest
+      console.log("User is already logged out or has a guest role.");
+    } else {
+      throw error;  // Rethrow error for handling in the UI if needed
+    }
+  }
+};
+
+
+// Retrieve all posts (documents)
+export const getAllPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseID,
+      config.videoCollectionId
+    );
+    return posts.documents;
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw new Error(error);
+  }
+};
+
+// Retrieve the latest posts (documents)
+export const getLatestPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseID,
+      config.videoCollectionId,
+      [Query.orderDesc('$createdAt'), Query.limit(7)]
+    );
+    return posts.documents;
+  } catch (error) {
+    console.error('Error fetching latest posts:', error);
+    throw new Error(error);
+  }
+};
+
+// Search posts by title (documents)
+export const searchPosts = async (query) => {
+  try {
+    const posts = await databases.listDocuments(
+      config.databaseID,
+      config.videoCollectionId,
+      [Query.search('title', query)]
+    );
+    return posts.documents;
+  } catch (error) {
+    console.error('Error searching posts:', error);
+    throw new Error(error);
+  }
+};
+export async function getUserPosts(userId) {
+    try {
+      const posts = await databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.videoCollectionId,
+        [Query.equal("creator", userId)]
+      );
+  
+      return posts.documents;
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
