@@ -7,7 +7,12 @@ import { Video, ResizeMode } from 'expo-av'
 import { icons } from '../../constants'
 import CustomButton from '../components/CustomButton'
 import * as DocumentPicker from 'expo-document-picker'
+import { createVideoPost } from '../../libb/appwrite'
+import { router } from 'expo-router'
+import {useGlobalContext} from '../../context/GlobalProvider'
+import * as ImagePicker from 'expo-image-picker'
 const Create = () => {
+  const {user} = useGlobalContext();
   const [uploading,setUploading] = useState (false);
   const [form,setForm] = useState ({
     title : '',
@@ -16,10 +21,11 @@ const Create = () => {
     prompt : ''
   })
   const openPicker = async (selectType) => {
-    const result = await DocumentPicker.getDocumentAsync ({
-      type : selectType === 'image' ?
-      ['image/png','image/jpeg', 'image/jpg'] : ['video/mp4', 'video/gif']
-    })
+    const result = await ImagePicker.launchImageLibraryAsync ({
+      mediaTypes : selectType ==='/image' ? ImagePicker.MediaTypeOptions.Images :ImagePicker.MediaTypeOptions.Videos,
+      aspect : [4,3],
+      quality : 1,
+    });
     if(!result.canceled) {
       if(selectType=== 'image') {
         setForm ({...form, thumbnail: result.assets[0]})
@@ -28,12 +34,32 @@ const Create = () => {
         setForm ({...form, video : result.assets[0]})
       }
     }
-    else {setTimeout(() => {
-      Alert.alert ('Document picked', JSON.stringify (result,null,2))
-    }, 100);}
+   
   }
-  const submit = () => {
-    
+  const submit = async () => {
+    if(!form.prompt || !form.title || !form.thumbnail || !form.video) {
+      Alert.alert ('Please fill all the fields')
+    }
+    setUploading (true)
+    try {
+
+      await createVideoPost({
+        ...form,userId: user.$id
+      });
+      Alert.alert ('Video Uploaded')
+      router.push ('/home')
+    } catch (error) {
+      Alert.alert ('Error', error.message)
+    } finally {
+      setForm ({
+        title : '',
+        video : null,
+        thumbnail : null,
+        prompt : ''
+      })
+      setUploading (false);
+    }
+
   }
   return (
     <SafeAreaView className = 'bg-primary h-full'>
@@ -60,9 +86,9 @@ const Create = () => {
           <Video
           source={ {uri: form.video.uri}}
           className = 'w-full h-64 rounded-2xl '
-          useNativeControls
+        
           resizeMode= {ResizeMode.COVER}
-          isLooping
+      
 
           />
         ) : (
