@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native'
+import { View, Text, ScrollView, TouchableOpacity, Image, Alert } from 'react-native'
 import React from 'react'
 import { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -18,13 +18,19 @@ const Create = () => {
   const openPicker = async (selectType) => {
     const result = await DocumentPicker.getDocumentAsync ({
       type : selectType === 'image' ?
-      ['image/png','image/jpg'] : ['video/mp4', 'video/gif']
+      ['image/png','image/jpeg', 'image/jpg'] : ['video/mp4', 'video/gif']
     })
     if(!result.canceled) {
       if(selectType=== 'image') {
         setForm ({...form, thumbnail: result.assets[0]})
       }
+      if(selectType=== 'video') {
+        setForm ({...form, video : result.assets[0]})
+      }
     }
+    else {setTimeout(() => {
+      Alert.alert ('Document picked', JSON.stringify (result,null,2))
+    }, 100);}
   }
   const submit = () => {
     
