@@ -5,6 +5,8 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import FormField from '../components/FormField'
 import { Video, ResizeMode } from 'expo-av'
 import { icons } from '../../constants'
+import CustomButton from '../components/CustomButton'
+import * as DocumentPicker from 'expo-document-picker'
 const Create = () => {
   const [uploading,setUploading] = useState (false);
   const [form,setForm] = useState ({
@@ -13,6 +15,20 @@ const Create = () => {
     thumbnail : null,
     prompt : ''
   })
+  const openPicker = async (selectType) => {
+    const result = await DocumentPicker.getDocumentAsync ({
+      type : selectType === 'image' ?
+      ['image/png','image/jpg'] : ['video/mp4', 'video/gif']
+    })
+    if(!result.canceled) {
+      if(selectType=== 'image') {
+        setForm ({...form, thumbnail: result.assets[0]})
+      }
+    }
+  }
+  const submit = () => {
+    
+  }
   return (
     <SafeAreaView className = 'bg-primary h-full'>
 <ScrollView className = 'px-4 my-6'>
@@ -32,7 +48,7 @@ const Create = () => {
     <Text className = 'text-base text-gray-100 font-pmedium  '>
     Upload Video
     </Text>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => openPicker ('video')}>
       {
         form.video ? (
           <Video
@@ -62,7 +78,7 @@ const Create = () => {
   <Text className = 'text-base text-gray-100 font-pmedium  '>
     Thumbnail  Image
     </Text>
-    <TouchableOpacity>
+    <TouchableOpacity onPress={() => openPicker ('image')}>
       {
         form.thumbnail ? (
           <Image
@@ -78,13 +94,28 @@ const Create = () => {
             resizeMode='contain'
             className = 'w-5 h-5'
             />
-        
+            <Text className = 'text-sm text-gray-100 font-pmedium'>Choose a file</Text>
           </View>
         )
       }
 
     </TouchableOpacity>
   </View>
+  <FormField
+    title = ' Description'
+    value={form.prompt}
+    placeholder={'Description'}
+    handleChangeText={(e)=> setForm({...form,
+      prompt : e  
+    })}
+    otherStyles={'mt-7'}
+    />
+    <CustomButton
+    title={'Publish'}
+    handlePress={submit}
+    otherStyles = {'mt-7'}
+    isLoading={uploading}
+    />
 </ScrollView>
     </SafeAreaView>
   )
