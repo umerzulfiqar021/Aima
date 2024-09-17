@@ -46,7 +46,7 @@ const SignIn = () => {
     className = {'w-[150px] h-[135px]'}
     />
     <Text className = {'text-2xl text-white text-semibold mt-10 font-psemibold'}>
-        Log in to PostPlay
+        Log in to <Text className = 'text-secondary-200'> PostPlay</Text> 
         </Text>
         <FormField
         title = "Email"

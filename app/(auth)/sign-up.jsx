@@ -42,10 +42,12 @@ const SignUp = () => {
       <View className = {' w-full justify-center  min-h-[83vh] px-4 my-6'} >
     <Image source={images.logo}
     resizeMode='contain'
-    className = {'w-[115px] h-[35px]'}
+    className = {'w-[190px] h-[160px]'}
     />
     <Text className = {'text-2xl text-white text-semibold mt-10 font-psemibold'}>
-        Sign up to Aora
+        Sign up to 
+        <Text className = 'text-secondary-200'>  PostPlay</Text>
+       
         </Text>
         <FormField
         title = "Username"
