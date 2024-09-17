@@ -210,7 +210,7 @@ export async function getUserPosts(userId) {
   
     try {
       const uploadedFile = await storage.createFile(
-        appwriteConfig.storageId,
+        config.storageId,
         ID.unique(),
         asset
       );
@@ -230,8 +230,8 @@ export async function getUserPosts(userId) {
       ]);
   
       const newPost = await databases.createDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.videoCollectionId,
+        config.databaseID,
+        config.videoCollectionId,
         ID.unique(),
         {
           title: form.title,
@@ -253,10 +253,10 @@ export async function getUserPosts(userId) {
   
     try {
       if (type === "video") {
-        fileUrl = storage.getFileView(appwriteConfig.storageId, fileId);
+        fileUrl = storage.getFileView(config.storageId, fileId);
       } else if (type === "image") {
         fileUrl = storage.getFilePreview(
-          appwriteConfig.storageId,
+          config.storageId,
           fileId,
           2000,
           2000,

@@ -22,7 +22,7 @@ const Create = () => {
   })
   const openPicker = async (selectType) => {
     const result = await ImagePicker.launchImageLibraryAsync ({
-      mediaTypes : selectType ==='/image' ? ImagePicker.MediaTypeOptions.Images :ImagePicker.MediaTypeOptions.Videos,
+      mediaTypes : selectType ==='image' ? ImagePicker.MediaTypeOptions.Images :ImagePicker.MediaTypeOptions.Videos,
       aspect : [4,3],
       quality : 1,
     });

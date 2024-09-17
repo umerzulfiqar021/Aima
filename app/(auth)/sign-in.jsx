@@ -9,7 +9,7 @@ import { getCurrentUser, signIn } from '../../libb/appwrite';
 import { useGlobalContext } from '../../context/GlobalProvider';
 
 const SignIn = () => {
-  const {setUser, setIslogged} = useGlobalContext();
+  const {setUser, setIsLogged} = useGlobalContext();
   const  [form,setForm] = useState ({
     email : "" ,
     password: ""
@@ -25,7 +25,7 @@ const SignIn = () => {
        await signIn(form.email,form.password);
        const result = await getCurrentUser();
        setUser(result);
-       setIslogged(true);
+       setIsLogged(true);
       router.replace('/home')
 
       
