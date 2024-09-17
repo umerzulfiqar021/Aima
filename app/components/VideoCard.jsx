@@ -3,10 +3,13 @@ import React from 'react'
 import { useState } from 'react'
 import { icons, images } from '../../constants'
 import { Video,ResizeMode } from 'expo-av'
+import { useGlobalContext } from '../../context/GlobalProvider'
+
 const VideoCard = ({video: {
     title, thumbnail, video, 
     // creator :  {username,avatar}
 }}) => {
+    const { user } = useGlobalContext();
     const [play,setPlay] = useState (false);
   return (
     <View className = {'flex-col items-center px-4 mb-14'}>
@@ -26,7 +29,7 @@ const VideoCard = ({video: {
                 </Text>
                 {/* i will write dummy user as it has not has creator yet */}
                 <Text className = 'text-xs text-gray-100 font-pregular ' numberOfLines={1}>
-                Umer Zulfiqar
+                {user?.username}
                 </Text>
                 </View>
 
