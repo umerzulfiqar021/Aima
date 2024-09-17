@@ -205,8 +205,13 @@ export async function getUserPosts(userId) {
   export async function uploadFile(file, type) {
     if (!file) return;
   
-    const { mimeType, ...rest } = file;
-    const asset = { type: mimeType, ...rest };
+    
+    const asset = { 
+      name: file.fileName,
+      type: file.mimeType,
+      size: file.fileSize,
+      uri: file.uri,
+     };
   
     try {
       const uploadedFile = await storage.createFile(
