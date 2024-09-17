@@ -196,6 +196,7 @@ export async function getUserPosts(userId) {
         config.databaseID,
         config.videoCollectionId,
         [Query.equal("creator", userId),Query.orderDesc ('$createdAt')]
+        
       );
   
       return posts.documents;

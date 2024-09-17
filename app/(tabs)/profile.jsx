@@ -25,11 +25,13 @@ const Profile = () => {
   };
 
   return (
+    
     <SafeAreaView className="bg-primary h-full">
       <FlatList
         data={posts}
         keyExtractor={(item) => item.$id}
         renderItem={({ item }) => (
+          
           <VideoCard
             title={item.title}
             thumbnail={item.thumbnail}
@@ -37,6 +39,8 @@ const Profile = () => {
             creator={item.creator.username}
             avatar={item.creator.avatar}
           />
+          
+
         )}
         ListEmptyComponent={() => (
           <EmptyState
@@ -87,7 +91,9 @@ const Profile = () => {
           </View>
         )}
       />
+      
     </SafeAreaView>
+    
   );
 };
 

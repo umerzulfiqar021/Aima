@@ -54,7 +54,7 @@ const TabsLayout = () => {
       )
     }}
     />
-    <Tabs.Screen name = "bookmark"
+    {/* <Tabs.Screen name = "bookmark"
     options = {{
       title : "Bookmark",
       headerShown : false,
@@ -67,7 +67,7 @@ const TabsLayout = () => {
         />
       )
     }}
-    />
+    /> */}
     <Tabs.Screen name = "create"
     options = {{
       title : "Create",
